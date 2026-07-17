@@ -30,7 +30,7 @@ public class Libro {
     @Column(nullable = false)
     private String titulo;
 
-    private String portadaURL;
+    private String portadaUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

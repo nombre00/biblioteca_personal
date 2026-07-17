@@ -3,13 +3,15 @@ package com.biblioteca.backend.repository;
 import com.biblioteca.backend.model.EstadoLibro;
 import com.biblioteca.backend.model.Libro;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface LibroRepository extends JpaRepository<Libro, Long> {
+public interface LibroRepository extends JpaRepository<Libro, Long>, 
+                                          JpaSpecificationExecutor<Libro>{
 
     // Filtrar por estado (POR_LEER, LEYENDO, LEIDO)
     List<Libro> findByEstado(EstadoLibro estado);
@@ -29,4 +31,10 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
     // Buscar por género (necesita @Query porque es relación ManyToMany)
     @Query("SELECT l FROM Libro l JOIN l.generos g WHERE LOWER(g.nombre) = LOWER(:nombreGenero)")
     List<Libro> findByGeneroNombre(@Param("nombreGenero") String nombreGenero);
+
+    // JpaSpecificationExecutor agrega automáticamente:
+    // findAll(Specification<Libro> spec)
+    // findAll(Specification<Libro> spec, Pageable pageable)
+    // findOne(Specification<Libro> spec)
+    // count(Specification<Libro> spec)
 }
