@@ -143,8 +143,8 @@ public class LibroService {
                 libro.getAutor().getPais() != null ? libro.getAutor().getPais().getNombre() : null
         );
 
-        List<String> nombresGeneros = libro.getGeneros().stream()
-                .map(Genero::getNombre)
+        List<GeneroDTO> generosDTO = libro.getGeneros().stream()
+                .map(g -> new GeneroDTO(g.getId(), g.getNombre()))
                 .collect(Collectors.toList());
 
         return new LibroResponseDTO(
@@ -154,7 +154,7 @@ public class LibroService {
                 libro.getPortadaUrl(),
                 libro.getEstado().name(),
                 autorDTO,
-                nombresGeneros
+                generosDTO
         );
     }
 }

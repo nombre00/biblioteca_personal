@@ -19,5 +19,5 @@ public class LibroResponseDTO {
     private String portadaUrl;
     private String estado;
     private AutorResumenDTO autor;
-    private List<String> generoNombres;
+    private List<GeneroDTO> generos;
 }
