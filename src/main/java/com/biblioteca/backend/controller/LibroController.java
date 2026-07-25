@@ -31,6 +31,11 @@ public class LibroController {
         return ResponseEntity.ok(libroService.buscarConFiltros(filtro));
     }
 
+    @GetMapping("/autor/{autorId}")
+    public ResponseEntity<List<LibroResponseDTO>> listarPorAutor(@PathVariable Long autorId) {
+        return ResponseEntity.ok(libroService.listarPorAutor(autorId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<LibroResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(libroService.buscarPorId(id));

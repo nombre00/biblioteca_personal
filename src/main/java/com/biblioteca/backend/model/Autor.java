@@ -28,4 +28,7 @@ public class Autor {
     @ManyToOne
     @JoinColumn(name = "pais_id")
     private Pais pais;
+
+    @Column(name = "retrato_url", nullable = true)
+    private String retratoUrl;
 }

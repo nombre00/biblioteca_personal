@@ -18,4 +18,6 @@ public class AutorDTO {
 
     @NotNull(message = "El país es obligatorio")
     private Long paisId;
+
+    private String retratoUrl;
 }

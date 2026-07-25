@@ -38,6 +38,13 @@ public class LibroService {
                 .collect(Collectors.toList());
     }
 
+    // Listar por autor.
+    public List<LibroResponseDTO> listarPorAutor(Long autorId){
+        return libroRepository.findByAutor_Id(autorId).stream()
+                .map(this::convertirAResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     // Lista por filtros ingresados.
     public List<LibroResponseDTO> buscarConFiltros(LibroFiltroDTO filtro) {
         Specification<Libro> spec = Specification  // Revisa que filtros tienen datos.

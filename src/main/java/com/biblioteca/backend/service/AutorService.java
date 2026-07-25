@@ -67,10 +67,11 @@ public class AutorService {
         autor.setNombre(dto.getNombre());
         autor.setIdioma(dto.getIdioma());
         autor.setPais(pais);
+        autor.setRetratoUrl(dto.getRetratoUrl());
     }
 
     private AutorResponseDTO convertirAResponseDTO(Autor autor) {
         PaisDTO paisDTO = new PaisDTO(autor.getPais().getId(), autor.getPais().getNombre());
-        return new AutorResponseDTO(autor.getId(), autor.getNombre(), autor.getIdioma(), paisDTO);
+        return new AutorResponseDTO(autor.getId(), autor.getNombre(), autor.getIdioma(), paisDTO, autor.getRetratoUrl());
     }
 }

@@ -15,4 +15,5 @@ public class AutorResponseDTO {
     private String nombre;
     private String idioma;
     private PaisDTO pais;
+    private String retratoUrl;
 }
