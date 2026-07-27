@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,4 +22,12 @@ public class AutorDTO {
     private Long paisId;
 
     private String retratoUrl;
+
+    private LocalDate fechaNacimiento;
+
+    private Integer anioNacimientoAprox;
+
+    private LocalDate fechaDefuncion;
+
+    private Integer anioDefuncionAprox;
 }

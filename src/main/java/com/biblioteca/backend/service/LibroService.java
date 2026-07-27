@@ -1,6 +1,7 @@
 package com.biblioteca.backend.service;
 
 import com.biblioteca.backend.dto.*;
+import com.biblioteca.backend.exception.DatosInvalidosException;
 import com.biblioteca.backend.exception.RecursoDuplicadoException;
 import com.biblioteca.backend.exception.RecursoNoEncontradoException;
 import com.biblioteca.backend.model.*;
@@ -127,11 +128,17 @@ public class LibroService {
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Autor no encontrado con id: " + dto.getAutorId()));
 
+        validarFechasLibro(dto);
+
         libro.setTitulo(dto.getTitulo());
         libro.setIsbn(dto.getIsbn());
         libro.setPortadaUrl(dto.getPortadaUrl());
         libro.setEstado(parsearEstado(dto.getEstado()));
         libro.setAutor(autor);
+        libro.setAnioPublicacion(dto.getAnioPublicacion());
+        libro.setAnioLectura(dto.getAnioLectura());
+        libro.setFechaInicio(dto.getFechaInicio());
+        libro.setFechaTermino(dto.getFechaTermino());
 
         if (dto.getGeneroIds() != null && !dto.getGeneroIds().isEmpty()) {
             Set<Genero> generos = new HashSet<>(generoRepository.findAllById(dto.getGeneroIds()));
@@ -161,7 +168,19 @@ public class LibroService {
                 libro.getPortadaUrl(),
                 libro.getEstado().name(),
                 autorDTO,
-                generosDTO
+                generosDTO,
+                libro.getAnioPublicacion(),
+                libro.getAnioLectura(),
+                libro.getFechaInicio(),
+                libro.getFechaTermino()
         );
+    }
+
+    private void validarFechasLibro(LibroDTO dto) {
+        if (dto.getFechaInicio() != null && dto.getFechaTermino() != null
+                && dto.getFechaInicio().isAfter(dto.getFechaTermino())) {
+            throw new DatosInvalidosException(
+                    "La fecha de inicio de lectura no puede ser posterior a la fecha de término");
+        }
     }
 }

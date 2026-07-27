@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -27,4 +28,12 @@ public class LibroDTO {
     private Long autorId;
 
     private List<Long> generoIds;
+
+    private Integer anioPublicacion;
+
+    private Integer anioLectura;
+
+    private LocalDate fechaInicio;
+
+    private LocalDate fechaTermino;
 }

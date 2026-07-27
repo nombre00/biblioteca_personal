@@ -37,4 +37,21 @@ public interface LibroRepository extends JpaRepository<Libro, Long>,
     // findAll(Specification<Libro> spec, Pageable pageable)
     // findOne(Specification<Libro> spec)
     // count(Specification<Libro> spec)
+
+    
+
+    // --- Estadísticas ---
+
+    // Conteo de libros agrupados por estado.
+    @Query("SELECT l.estado, COUNT(l) FROM Libro l GROUP BY l.estado")
+    List<Object[]> contarPorEstado();
+
+    // Conteo de libros agrupados por género (join por ser ManyToMany).
+    @Query("SELECT g.nombre, COUNT(l) FROM Libro l JOIN l.generos g GROUP BY g.nombre")
+    List<Object[]> contarPorGenero();
+
+    // Conteo de libros agrupados por año de lectura (excluye libros sin año registrado).
+    @Query("SELECT l.anioLectura, COUNT(l) FROM Libro l WHERE l.anioLectura IS NOT NULL " +
+           "GROUP BY l.anioLectura ORDER BY l.anioLectura")
+    List<Object[]> contarPorAnioLectura();
 }

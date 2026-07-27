@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -20,4 +21,8 @@ public class LibroResponseDTO {
     private String estado;
     private AutorResumenDTO autor;
     private List<GeneroDTO> generos;
+    private Integer anioPublicacion;
+    private Integer anioLectura;
+    private LocalDate fechaInicio;
+    private LocalDate fechaTermino;
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,4 +44,16 @@ public class Libro {
         inverseJoinColumns = @JoinColumn(name = "genero_id")
     )
     private Set<Genero> generos = new HashSet<>();
+
+    @Column(name = "anio_publicacion", nullable = true)
+    private Integer anioPublicacion;
+
+    @Column(name = "anio_lectura", nullable = true)
+    private Integer anioLectura;
+
+    @Column(name = "fecha_inicio", nullable = true)
+    private LocalDate fechaInicio;
+
+    @Column(name = "fecha_termino", nullable = true)
+    private LocalDate fechaTermino;
 }
