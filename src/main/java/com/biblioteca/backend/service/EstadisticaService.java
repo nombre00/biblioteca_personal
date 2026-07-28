@@ -75,17 +75,18 @@ public class EstadisticaService {
     public List<ConteoDobleDTO> obtenerConteoPorAutor(Integer anio) {
         if (anio != null) {
             return libroRepository.contarPorAutorYAnio(anio).stream()
-                    .map(fila -> new ConteoDobleDTO((String) fila[0], null, (Long) fila[1]))
+                    .map(fila -> new ConteoDobleDTO((String) fila[0], null, (Long) fila[1], null))
                     .toList();
         }
         List<Object[]> totales = libroRepository.contarTotalPorAutor();
-        Map<String, Long> mapaLeidos = libroRepository.contarLeidosPorAutor(EstadoLibro.LEIDO).stream()
-                .collect(Collectors.toMap(fila -> (String) fila[0], fila -> (Long) fila[1]));
+        Map<Long, Long> mapaLeidos = libroRepository.contarLeidosPorAutor(EstadoLibro.LEIDO).stream()
+                .collect(Collectors.toMap(fila -> (Long) fila[0], fila -> (Long) fila[2]));
         return totales.stream()
                 .map(fila -> {
-                    String etiqueta = (String) fila[0];
-                    Long total = (Long) fila[1];
-                    return new ConteoDobleDTO(etiqueta, total, mapaLeidos.getOrDefault(etiqueta, 0L));
+                    Long autorId = (Long) fila[0];
+                    String etiqueta = (String) fila[1];
+                    Long total = (Long) fila[2];
+                    return new ConteoDobleDTO(etiqueta, total, mapaLeidos.getOrDefault(autorId, 0L), autorId);
                 })
                 .sorted(Comparator.comparingLong(ConteoDobleDTO::getCantidadLeidos).reversed())
                 .toList();
@@ -95,7 +96,7 @@ public class EstadisticaService {
     public List<ConteoDobleDTO> obtenerConteoPorPais(Integer anio) {
         if (anio != null) {
             return libroRepository.contarPorPaisYAnio(anio).stream()
-                    .map(fila -> new ConteoDobleDTO((String) fila[0], null, (Long) fila[1]))
+                    .map(fila -> new ConteoDobleDTO((String) fila[0], null, (Long) fila[1], null))
                     .toList();
         }
         List<Object[]> totales = libroRepository.contarTotalPorPais();
@@ -105,7 +106,7 @@ public class EstadisticaService {
                 .map(fila -> {
                     String etiqueta = (String) fila[0];
                     Long total = (Long) fila[1];
-                    return new ConteoDobleDTO(etiqueta, total, mapaLeidos.getOrDefault(etiqueta, 0L));
+                    return new ConteoDobleDTO(etiqueta, total, mapaLeidos.getOrDefault(etiqueta, 0L), null);
                 })
                 .toList();
     }

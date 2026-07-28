@@ -41,7 +41,6 @@ public interface LibroRepository extends JpaRepository<Libro, Long>,
     
 
     // --- Estadísticas ---
-
     // Conteo de libros agrupados por estado.
     @Query("SELECT l.estado, COUNT(l) FROM Libro l GROUP BY l.estado")
     List<Object[]> contarPorEstado();
@@ -62,12 +61,11 @@ public interface LibroRepository extends JpaRepository<Libro, Long>,
 
 
       // --- Por autor ---
-
-       @Query("SELECT a.nombre, COUNT(l) FROM Libro l JOIN l.autor a " +
+       @Query("SELECT a.id, a.nombre, COUNT(l) FROM Libro l JOIN l.autor a " +
               "GROUP BY a.id, a.nombre")
        List<Object[]> contarTotalPorAutor();
 
-       @Query("SELECT a.nombre, COUNT(l) FROM Libro l JOIN l.autor a " +
+       @Query("SELECT a.id, a.nombre, COUNT(l) FROM Libro l JOIN l.autor a " +
               "WHERE l.estado = :estado GROUP BY a.id, a.nombre")
        List<Object[]> contarLeidosPorAutor(@Param("estado") EstadoLibro estado);
 
@@ -75,8 +73,8 @@ public interface LibroRepository extends JpaRepository<Libro, Long>,
               "WHERE l.anioLectura = :anio GROUP BY a.id, a.nombre ORDER BY COUNT(l) DESC")
        List<Object[]> contarPorAutorYAnio(@Param("anio") Integer anio);
 
-       // --- Por país (a través de autor) ---
 
+       // --- Por país (a través de autor) ---
        @Query("SELECT p.nombre, COUNT(l) FROM Libro l JOIN l.autor a JOIN a.pais p " +
               "GROUP BY p.id, p.nombre ORDER BY COUNT(l) DESC")
        List<Object[]> contarTotalPorPais();
@@ -88,4 +86,10 @@ public interface LibroRepository extends JpaRepository<Libro, Long>,
        @Query("SELECT p.nombre, COUNT(l) FROM Libro l JOIN l.autor a JOIN a.pais p " +
               "WHERE l.anioLectura = :anio GROUP BY p.id, p.nombre ORDER BY COUNT(l) DESC")
        List<Object[]> contarPorPaisYAnio(@Param("anio") Integer anio);
+
+
+       // --- Recomendaciones ---
+       // Trae todos los libros POR_LEER con su autor ya cargado (JOIN FETCH evita N+1 al leer autor.getNombre() después).
+       @Query("SELECT l FROM Libro l JOIN FETCH l.autor WHERE l.estado = :estado")
+       List<Libro> findByEstadoConAutor(@Param("estado") EstadoLibro estado);
 }

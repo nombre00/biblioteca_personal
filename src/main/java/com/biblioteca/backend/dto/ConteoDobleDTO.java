@@ -13,4 +13,5 @@ public class ConteoDobleDTO {
     private String etiqueta;
     private Long cantidadTotal;   // null cuando hay filtro de año activo (no aplica)
     private Long cantidadLeidos;
+    private Long autorId;         // solo poblado en "por autor" (vista "Todos"); null en género, país, y en "por autor" filtrado por año
 }
