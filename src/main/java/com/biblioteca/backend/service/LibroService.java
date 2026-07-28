@@ -158,8 +158,8 @@ public class LibroService {
         );
 
         List<GeneroDTO> generosDTO = libro.getGeneros().stream()
-                .map(g -> new GeneroDTO(g.getId(), g.getNombre()))
-                .collect(Collectors.toList());
+        .map(g -> new GeneroDTO(g.getId(), g.getNombre(), g.getIconoSlug()))
+        .collect(Collectors.toList());
 
         return new LibroResponseDTO(
                 libro.getId(),

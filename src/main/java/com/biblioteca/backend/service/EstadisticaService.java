@@ -31,13 +31,6 @@ public class EstadisticaService {
                 .collect(Collectors.toList());
     }
 
-    // Conteo por género.
-    public List<ConteoDTO> obtenerConteoPorGenero() {
-        return libroRepository.contarPorGenero().stream()
-                .map(fila -> new ConteoDTO((String) fila[0], (Long) fila[1]))
-                .collect(Collectors.toList());
-    }
-
     // Conteo por año de lectura.
     public List<ConteoDTO> obtenerConteoPorAnioLectura() {
         return libroRepository.contarPorAnioLectura().stream()
@@ -45,10 +38,19 @@ public class EstadisticaService {
                 .collect(Collectors.toList());
     }
 
+    // Conteo por género.
+    public List<ConteoDTO> obtenerConteoPorGenero() {
+        return libroRepository.contarPorGenero().stream()
+                .map(fila -> new ConteoDTO((String) fila[0], (Long) fila[1]))
+                .sorted(Comparator.comparingLong(ConteoDTO::getCantidad).reversed())
+                .collect(Collectors.toList());
+    }
+
     // Conteo por año de lectura y agrupado por género.
     public List<ConteoDTO> obtenerConteoPorGeneroPorAnio(Integer anio) {
         return libroRepository.contarPorGeneroYAnio(anio).stream()
             .map(fila -> new ConteoDTO((String) fila[0], (Long) fila[1]))
+            .sorted(Comparator.comparingLong(ConteoDTO::getCantidad).reversed())
             .toList();
     }
 

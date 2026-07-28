@@ -21,4 +21,7 @@ public class Genero {
 
     @Column(nullable = false, unique = true)
     private String nombre;
+
+    @Column(name = "icono_slug")
+    private String iconoSlug;
 }

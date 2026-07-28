@@ -21,7 +21,7 @@ public class GeneroService {
 
     public List<GeneroDTO> listarTodos() {
         return generoRepository.findAll().stream()
-                .map(genero -> new GeneroDTO(genero.getId(), genero.getNombre()))
+                .map(genero -> new GeneroDTO(genero.getId(), genero.getNombre(), genero.getIconoSlug()))
                 .collect(Collectors.toList());
     }
 
@@ -31,8 +31,25 @@ public class GeneroService {
         }
         Genero genero = new Genero();
         genero.setNombre(dto.getNombre());
+        genero.setIconoSlug(dto.getIconoSlug());
         Genero guardado = generoRepository.save(genero);
-        return new GeneroDTO(guardado.getId(), guardado.getNombre());
+        return new GeneroDTO(guardado.getId(), guardado.getNombre(), guardado.getIconoSlug());
+    }
+
+    public GeneroDTO actualizar(Long id, GeneroDTO dto) {
+        Genero genero = generoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Género no encontrado con id: " + id));
+
+        generoRepository.findByNombreIgnoreCase(dto.getNombre())
+                .filter(existente -> !existente.getId().equals(id))
+                .ifPresent(existente -> {
+                    throw new RecursoDuplicadoException("Ya existe un género con el nombre: " + dto.getNombre());
+                });
+
+        genero.setNombre(dto.getNombre());
+        genero.setIconoSlug(dto.getIconoSlug());
+        Genero actualizado = generoRepository.save(genero);
+        return new GeneroDTO(actualizado.getId(), actualizado.getNombre(), actualizado.getIconoSlug());
     }
 
     public void eliminar(Long id) {

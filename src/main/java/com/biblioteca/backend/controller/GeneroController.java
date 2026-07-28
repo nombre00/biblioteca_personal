@@ -30,6 +30,12 @@ public class GeneroController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<GeneroDTO> actualizar(@PathVariable Long id, @Valid @RequestBody GeneroDTO dto) {
+        GeneroDTO actualizado = generoService.actualizar(id, dto);
+        return ResponseEntity.ok(actualizado);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         generoService.eliminar(id);

@@ -16,4 +16,6 @@ public class GeneroDTO {
 
     @NotBlank(message = "El nombre del género es obligatorio")
     private String nombre;
+
+    private String iconoSlug;
 }
