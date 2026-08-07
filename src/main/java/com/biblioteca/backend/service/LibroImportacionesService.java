@@ -2,7 +2,6 @@ package com.biblioteca.backend.service;
 
 import com.biblioteca.backend.dto.*;
 import com.biblioteca.backend.dto.importacion.*;
-import com.biblioteca.backend.dto.importacion.ImportarLibroExternoDTO;
 import com.biblioteca.backend.exception.DatosInvalidosException;
 import com.biblioteca.backend.model.Genero;
 import com.biblioteca.backend.model.Pais;
@@ -105,8 +104,12 @@ public class LibroImportacionesService {
             return paisImport.getPaisId();
         }
 
-        String nombre = (paisImport != null && paisImport.getNombre() != null && !paisImport.getNombre().isBlank())
-                ? paisImport.getNombre()
+        String nombreDesdeDatos = (paisImport != null && paisImport.getDatos() != null)
+                ? paisImport.getDatos().getNombre()
+                : null;
+
+        String nombre = (nombreDesdeDatos != null && !nombreDesdeDatos.isBlank())
+                ? nombreDesdeDatos
                 : PAIS_PLACEHOLDER;
 
         return buscarOCrearPais(nombre);

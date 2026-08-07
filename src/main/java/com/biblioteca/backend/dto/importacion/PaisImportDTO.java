@@ -12,7 +12,7 @@ public class PaisImportDTO {
     // Si viene, se vincula directo al país existente con este id.
     private Long paisId;
 
-    // Se usa solo si paisId viene null: nombre normalizado por el LLM
-    // (o ausente del todo si Wikidata no encontró país para el autor).
-    private String nombre;
+    // Se usa solo si paisId viene null: datos del país nuevo a crear
+    // (o a buscar-o-crear, en el caso del placeholder PAIS_PENDIENTE).
+    private PaisNuevoDTO datos;
 }
