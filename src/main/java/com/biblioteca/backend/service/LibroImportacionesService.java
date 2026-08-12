@@ -59,6 +59,11 @@ public class LibroImportacionesService {
         libroDTO.setAutorId(autorId);
         libroDTO.setGeneroIds(generoIds);
         libroDTO.setAnioPublicacion(dto.getAnioPublicacion());
+        // Lectura personal — opcionales, null si el usuario no los llenó
+        // (libro por leer o leyendo, no aplica todavía).
+        libroDTO.setAnioLectura(dto.getAnioLectura());
+        libroDTO.setFechaInicio(dto.getFechaInicio());
+        libroDTO.setFechaTermino(dto.getFechaTermino());
 
         return libroService.crear(libroDTO);
     }

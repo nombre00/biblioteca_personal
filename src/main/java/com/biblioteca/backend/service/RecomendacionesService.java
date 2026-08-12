@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class RecomendacionesService {
 
-    private static final int CANTIDAD_SUGERENCIAS = 5;
+    private static final int CANTIDAD_SUGERENCIAS = 21;
 
     private final LibroRepository libroRepository;
     private final EstadisticaService estadisticaService;
