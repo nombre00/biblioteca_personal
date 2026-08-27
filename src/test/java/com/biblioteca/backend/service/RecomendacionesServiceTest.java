@@ -102,7 +102,7 @@ class RecomendacionesServiceTest {
             List<SugerenciaLibroDTO> resultado = service.obtenerPorAutorPendiente();
 
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.get(0).getId()).isEqualTo(100L);
+            assertThat(resultado.get(0).getLibroId()).isEqualTo(100L);
             assertThat(resultado.get(0).getTitulo()).isEqualTo("Memorabilia");
             assertThat(resultado.get(0).getAutorNombre()).isEqualTo("Jenofonte");
         }
@@ -121,7 +121,7 @@ class RecomendacionesServiceTest {
             List<SugerenciaLibroDTO> resultado = service.obtenerPorAutorPendiente();
 
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.get(0).getId()).isIn(100L, 101L, 102L);
+            assertThat(resultado.get(0).getLibroId()).isIn(100L, 101L, 102L);
         }
     }
 
@@ -145,7 +145,7 @@ class RecomendacionesServiceTest {
 
             List<SugerenciaLibroDTO> resultado = service.obtenerPorAutorPendiente();
 
-            assertThat(resultado).extracting(SugerenciaLibroDTO::getId)
+            assertThat(resultado).extracting(SugerenciaLibroDTO::getLibroId)
                     .containsExactly(100L, 200L, 300L);
         }
 
@@ -163,7 +163,7 @@ class RecomendacionesServiceTest {
             List<SugerenciaLibroDTO> resultado = service.obtenerPorAutorPendiente();
 
             assertThat(resultado).hasSize(2);
-            assertThat(resultado).extracting(SugerenciaLibroDTO::getId)
+            assertThat(resultado).extracting(SugerenciaLibroDTO::getLibroId)
                     .containsExactlyInAnyOrder(100L, 200L);
         }
 
@@ -180,7 +180,7 @@ class RecomendacionesServiceTest {
             List<SugerenciaLibroDTO> resultado = service.obtenerPorAutorPendiente();
 
             assertThat(resultado).hasSize(1);
-            assertThat(resultado.get(0).getId()).isEqualTo(200L);
+            assertThat(resultado.get(0).getLibroId()).isEqualTo(200L);
         }
     }
 
@@ -209,10 +209,10 @@ class RecomendacionesServiceTest {
 
             assertThat(resultado).hasSize(21);
             // El autor 25 (el último, más allá del cupo) no debe estar incluido.
-            assertThat(resultado).extracting(SugerenciaLibroDTO::getId)
+            assertThat(resultado).extracting(SugerenciaLibroDTO::getLibroId)
                     .doesNotContain(2500L);
             // El autor 4 (primero con pendiente tras los 3 sin pendientes) sí debe estar.
-            assertThat(resultado).extracting(SugerenciaLibroDTO::getId)
+            assertThat(resultado).extracting(SugerenciaLibroDTO::getLibroId)
                     .contains(400L);
         }
     }

@@ -1,15 +1,15 @@
 # Tests unitarios — biblioteca-backend
 
-Este documento registra los tests unitarios escritos hasta ahora para la capa `service/` del backend, con el criterio usado y los casos de uso cubiertos por cada uno. Sirve como mapa de cobertura y como referencia rápida de qué se prueba y por qué, sin tener que abrir cada archivo de test.
+Este documento registra los tests unitarios escritos hasta ahora para el backend, con el criterio usado y los casos de uso cubiertos por cada uno. Sirve como mapa de cobertura y como referencia rápida de qué se prueba y por qué, sin tener que abrir cada archivo de test.
 
 ## Enfoque general
 
 - **Framework**: JUnit 5 + Mockito (`@ExtendWith(MockitoExtension.class)`), sin `@SpringBootTest` — los repositorios y services colaboradores se mockean, no se levanta contexto de Spring.
-- **Alcance**: capa `service/` primero, por ser donde vive la lógica de negocio real (validaciones, reglas, orquestación). Controllers y `GlobalExceptionHandler` quedan para una siguiente etapa.
+- **Alcance**: capa `service/` primero, por ser donde vive la lógica de negocio real (validaciones, reglas, orquestación). Luego `GlobalExceptionHandler`, por el mismo criterio (mapeo de errores es parte del contrato real de la API). Controllers quedan como opcional/menor prioridad — son mayormente passthrough hacia los services ya cubiertos.
 - **Estructura**: cada test class usa `@Nested` para agrupar por método del service (`Crear`, `Actualizar`, `Eliminar`, etc.).
 - **Orden de validaciones**: cuando un método valida más de una cosa (ej. existencia de una entidad relacionada + reglas de negocio), se testea explícitamente cuál validación gana cuando ambas fallarían al mismo tiempo, para dejar ese comportamiento documentado y detectar si cambia sin querer en el futuro.
 
-## Estado: **último archivo (`RecomendacionesServiceTest`) tiene errores de compilación sin corregir** — pendiente para la próxima sesión.
+## Estado: **todos los tests escritos hasta ahora compilan y pasan.** Cierra la primera pasada completa de la capa `service/` + `GlobalExceptionHandler` del backend Java.
 
 ---
 
@@ -50,7 +50,7 @@ Cubre el flujo de importación externa (`país → autor → géneros → libro`
 
 ## `LibroServiceTest`
 
-El service más grande cubierto hasta ahora.
+El service más grande cubierto.
 
 - **Listados**: `listarTodos` con y sin país del autor (el DTO de autor resumido debe manejar el caso de autor sin país asociado); `listarPorAutor` delegando al repositorio.
 - **`buscarConFiltros`**: **limitación documentada** — con mocks puros solo se puede verificar que el service arma una `Specification` y delega al repositorio, y que mapea bien el resultado devuelto. La lógica real de cada predicado (`LibroSpecification.tieneEstado`, `tieneAlgunGenero`, etc.) no es verificable así; necesitaría un `@DataJpaTest` con base H2 en memoria para probarse contra SQL generado de verdad. **Pendiente como tarea futura si se quiere cobertura real de los filtros.**
@@ -73,7 +73,7 @@ El más simple — no tiene método `actualizar` (el CRUD real de país solo exp
 - **`crear`**: nombre duplicado (sin guardar); caso feliz; nota de que la comparación case-insensitive la hace el repositorio (`findByNombreIgnoreCase`), el service no normaliza nada por su cuenta.
 - **`eliminar`**: inexistente vs. existente.
 
-## `RecomendacionesServiceTest` — **con errores de compilación pendientes de corregir**
+## `RecomendacionesServiceTest`
 
 Cubre `obtenerPorAutorPendiente()`, que arma hasta 21 sugerencias recorriendo el ranking de autores por libros leídos y eligiendo un pendiente al azar de cada uno.
 
@@ -81,7 +81,7 @@ Particularidades de este service que afectan el testeo:
 - Depende de **otro service** (`EstadisticaService.obtenerConteoPorAutor(null)`), no solo de un repositorio — hay que mockear ambos colaboradores.
 - Usa `java.util.Random` instanciado inline dentro del service (no inyectado), así que cuando un autor tiene más de un libro pendiente, el resultado exacto **no es determinístico**. Los tests para ese caso solo verifican que el libro elegido pertenece al conjunto de pendientes del autor (`isIn(...)`), no cuál específicamente. Con un solo pendiente por autor sí es determinístico (`Random.nextInt(1)` siempre da `0`), y esos casos se usan para verificaciones más finas.
 
-Casos cubiertos (pendientes de que compilen):
+Casos cubiertos:
 - Ranking vacío → lista vacía.
 - Autor sin pendientes → se salta **sin** consumir cupo (no cuenta como una de las 21 sugerencias).
 - Autor con un solo pendiente → elección determinística, verificando id/título/autor.
@@ -90,14 +90,22 @@ Casos cubiertos (pendientes de que compilen):
 - Agrupación por `autorId`, no por nombre/título — verificado con dos autores distintos que comparten el mismo título de libro, para asegurar que no se mezclan sus pendientes.
 - Cupo máximo de 21: ranking armado con autores sin pendientes al principio (no deben gastar cupo) más 22 autores con un pendiente cada uno, verificando que entran exactamente 21 y que el que se pasa del límite queda excluido.
 
-**Nota abierta**: se asumieron los getters de `SugerenciaLibroDTO` (`getId`/`getTitulo`/`getAutorNombre`/`getPortadaUrl`) a partir del orden posicional del constructor usado en el service, sin haber visto el DTO real — es la causa más probable de los errores de compilación reportados. **Corregir en la próxima sesión.**
+**Nota técnica**: los getters reales de `SugerenciaLibroDTO` son `getLibroId()`/`getTitulo()`/`getAutorNombre()`/`getUrlPortada()` — la primera versión del test asumió `getId()`/`getPortadaUrl()` (incorrectos) a partir del orden posicional del constructor, sin haber visto el DTO real; eso rompía la compilación. Corregido tras confirmar el DTO real.
+
+## `GlobalExceptionHandlerTest`
+
+Verifica el mapeo de cada excepción de dominio a su `ResponseEntity` (status HTTP + body `ErrorResponseDTO`) correspondiente. No necesita mocks propios del handler (es puro mapeo, se instancia directo), salvo para `MethodArgumentNotValidException`, que se mockea con Mockito porque su constructor real exige un `MethodParameter` que no aporta nada armar a mano — solo se stubea `getBindingResult()` con un `BindingResult` real construido con `FieldError`s reales.
+
+- **`RecursoNoEncontradoException`** → 404, con el mensaje de la excepción propagado al body.
+- **`RecursoDuplicadoException`** → 409.
+- **`DatosInvalidosException`** → 400.
+- **`MethodArgumentNotValidException`** → 400, con el mensaje armado a partir de los `FieldError`: un solo error de campo, varios errores (verificando el join con `"; "` como separador y que respeta el orden), y el caso borde de cero errores de campo (mensaje vacío, no debe romper).
 
 ---
 
 ## Pendiente general
 
-1. **Corregir `RecomendacionesServiceTest`** (errores de compilación, probablemente por los getters asumidos de `SugerenciaLibroDTO`).
-2. `GlobalExceptionHandler` — verificar el mapeo de cada excepción de dominio a su status HTTP correspondiente.
-3. Controllers (`@WebMvcTest`) — opcional, evaluar si se justifica la inversión de tiempo dado que son mayormente passthrough hacia los services ya cubiertos.
-4. `LibroSpecification` — cobertura real de los predicados de filtro vía `@DataJpaTest` con H2, ya que no es verificable con mocks puros (ver nota en `LibroServiceTest`).
-5. Evaluar si conviene inyectar `Random` en `RecomendacionesService` (en vez de instanciarlo inline) para poder testear determinísticamente la elección entre varios pendientes — actualmente es una limitación de testeabilidad, no un bug.
+1. `LibroSpecification` — cobertura real de los predicados de filtro (`buscarConFiltros`) vía `@DataJpaTest` con H2, ya que no es verificable con mocks puros (ver nota en `LibroServiceTest`).
+2. Controllers (`@WebMvcTest`) — opcional, evaluar si se justifica la inversión de tiempo dado que son mayormente passthrough hacia los services ya cubiertos.
+3. Evaluar si conviene inyectar `Random` en `RecomendacionesService` (en vez de instanciarlo inline) para poder testear determinísticamente la elección entre varios pendientes — actualmente es una limitación de testeabilidad, no un bug.
+4. **Backend Java queda cerrado por ahora** en cuanto a la primera pasada de tests unitarios. Próximo salto sugerido: `agentes-ia` (Python/FastAPI) con pytest, o el frontend (Angular) con Vitest — decisión pendiente de con cuál seguir.
